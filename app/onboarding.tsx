@@ -457,7 +457,7 @@ export default function OnboardingScreen() {
                 return (
                   <Animated.View
                     key={`${currentQuestion}-${index}`}
-                    entering={SlideInDown.delay(index * 80).duration(400).springify()}
+                    entering={FadeIn.delay(index * 120).duration(600).easing(Easing.out(Easing.cubic))}
                     layout={Layout.springify()}
                   >
                     <TouchableOpacity
