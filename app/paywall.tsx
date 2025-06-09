@@ -3,6 +3,11 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } fr
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Brain, TrendingUp, Calendar, Target, Check } from 'lucide-react-native';
+import Animated, { 
+  FadeIn, 
+  Layout,
+  Easing
+} from 'react-native-reanimated';
 
 export default function PaywallScreen() {
   const router = useRouter();
@@ -42,81 +47,109 @@ export default function PaywallScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
-            <View style={styles.header}>
+            <Animated.View 
+              style={styles.header}
+              entering={FadeIn.duration(600).easing(Easing.out(Easing.cubic))}
+            >
               <Text style={styles.title}>Unlock Your Personalized Mood Plan</Text>
               <Text style={styles.subtitle}>
                 Start your journey to better mental wellness with AI-powered insights
               </Text>
-            </View>
+            </Animated.View>
 
             <View style={styles.benefitsContainer}>
               {benefits.map((benefit, index) => {
                 const IconComponent = benefit.icon;
                 return (
-                  <View key={index} style={styles.benefitCard}>
-                    <View style={styles.iconContainer}>
-                      <IconComponent size={24} color="#3b82f6" />
+                  <Animated.View
+                    key={index}
+                    entering={FadeIn.delay(index * 150 + 200).duration(600).easing(Easing.out(Easing.cubic))}
+                    layout={Layout.springify()}
+                  >
+                    <View style={styles.benefitCard}>
+                      <View style={styles.iconContainer}>
+                        <IconComponent size={24} color="#3b82f6" />
+                      </View>
+                      <View style={styles.benefitContent}>
+                        <Text style={styles.benefitTitle}>{benefit.title}</Text>
+                        <Text style={styles.benefitDescription}>{benefit.description}</Text>
+                      </View>
                     </View>
-                    <View style={styles.benefitContent}>
-                      <Text style={styles.benefitTitle}>{benefit.title}</Text>
-                      <Text style={styles.benefitDescription}>{benefit.description}</Text>
-                    </View>
-                  </View>
+                  </Animated.View>
                 );
               })}
             </View>
 
             <View style={styles.pricingContainer}>
-              <TouchableOpacity
-                style={[styles.planCard, selectedPlan === 'yearly' && styles.selectedPlan]}
-                onPress={() => setSelectedPlan('yearly')}
+              <Animated.View
+                entering={FadeIn.delay(800).duration(600).easing(Easing.out(Easing.cubic))}
+                layout={Layout.springify()}
               >
-                <View style={styles.planHeader}>
-                  <View style={styles.planInfo}>
-                    <Text style={styles.planName}>Yearly</Text>
-                    <Text style={styles.planPrice}>$59.99/year</Text>
+                <TouchableOpacity
+                  style={[styles.planCard, selectedPlan === 'yearly' && styles.selectedPlan]}
+                  onPress={() => setSelectedPlan('yearly')}
+                >
+                  <View style={styles.planHeader}>
+                    <View style={styles.planInfo}>
+                      <Text style={styles.planName}>Yearly</Text>
+                      <Text style={styles.planPrice}>$59.99/year</Text>
+                    </View>
+                    <View style={styles.savesBadge}>
+                      <Text style={styles.savesText}>Save 58%</Text>
+                    </View>
                   </View>
-                  <View style={styles.savesBadge}>
-                    <Text style={styles.savesText}>Save 58%</Text>
-                  </View>
-                </View>
-                <Text style={styles.planDescription}>Best value - $5.00/month</Text>
-                {selectedPlan === 'yearly' && (
-                  <View style={styles.checkIcon}>
-                    <Check size={20} color="#3b82f6" />
-                  </View>
-                )}
-              </TouchableOpacity>
+                  <Text style={styles.planDescription}>Best value - $5.00/month</Text>
+                  {selectedPlan === 'yearly' && (
+                    <Animated.View 
+                      style={styles.checkIcon}
+                      entering={FadeIn.duration(200)}
+                    >
+                      <Check size={20} color="#3b82f6" />
+                    </Animated.View>
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
 
-              <TouchableOpacity
-                style={[styles.planCard, selectedPlan === 'monthly' && styles.selectedPlan]}
-                onPress={() => setSelectedPlan('monthly')}
+              <Animated.View
+                entering={FadeIn.delay(950).duration(600).easing(Easing.out(Easing.cubic))}
+                layout={Layout.springify()}
               >
-                <View style={styles.planHeader}>
-                  <View style={styles.planInfo}>
-                    <Text style={styles.planName}>Monthly</Text>
-                    <Text style={styles.planPrice}>$11.99/month</Text>
+                <TouchableOpacity
+                  style={[styles.planCard, selectedPlan === 'monthly' && styles.selectedPlan]}
+                  onPress={() => setSelectedPlan('monthly')}
+                >
+                  <View style={styles.planHeader}>
+                    <View style={styles.planInfo}>
+                      <Text style={styles.planName}>Monthly</Text>
+                      <Text style={styles.planPrice}>$11.99/month</Text>
+                    </View>
                   </View>
-                </View>
-                <Text style={styles.planDescription}>Flexible monthly billing</Text>
-                {selectedPlan === 'monthly' && (
-                  <View style={styles.checkIcon}>
-                    <Check size={20} color="#3b82f6" />
-                  </View>
-                )}
-              </TouchableOpacity>
+                  <Text style={styles.planDescription}>Flexible monthly billing</Text>
+                  {selectedPlan === 'monthly' && (
+                    <Animated.View 
+                      style={styles.checkIcon}
+                      entering={FadeIn.duration(200)}
+                    >
+                      <Check size={20} color="#3b82f6" />
+                    </Animated.View>
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
             </View>
           </View>
         </ScrollView>
 
-        <View style={styles.footer}>
+        <Animated.View 
+          style={styles.footer}
+          entering={FadeIn.delay(1100).duration(600).easing(Easing.out(Easing.cubic))}
+        >
           <TouchableOpacity style={styles.startButton} onPress={handleStartPlan}>
             <Text style={styles.startButtonText}>Start My Plan</Text>
           </TouchableOpacity>
           <Text style={styles.termsText}>
             By continuing, you agree to our Terms of Service and Privacy Policy
           </Text>
-        </View>
+        </Animated.View>
       </SafeAreaView>
     </LinearGradient>
   );
