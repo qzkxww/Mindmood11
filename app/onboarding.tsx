@@ -136,6 +136,14 @@ export default function OnboardingScreen() {
   const sparkle5Opacity = useSharedValue(0);
   const sparkle6Opacity = useSharedValue(0);
 
+  // Visual design animations
+  const pulseScale = useSharedValue(1);
+  const coreGlow = useSharedValue(0);
+  const particle1Rotation = useSharedValue(0);
+  const particle2Rotation = useSharedValue(0);
+  const particle3Float = useSharedValue(0);
+  const particle4Float = useSharedValue(0);
+
   // Initialize entrance animation
   useEffect(() => {
     contentOpacity.value = withTiming(1, {
@@ -147,6 +155,55 @@ export default function OnboardingScreen() {
       duration: 500,
       easing: Easing.out(Easing.cubic),
     });
+
+    // Start visual design animations
+    pulseScale.value = withRepeat(
+      withSequence(
+        withTiming(1.1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+
+    coreGlow.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.4, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+
+    particle1Rotation.value = withRepeat(
+      withTiming(360, { duration: 8000, easing: Easing.linear }),
+      -1,
+      false
+    );
+
+    particle2Rotation.value = withRepeat(
+      withTiming(-360, { duration: 12000, easing: Easing.linear }),
+      -1,
+      false
+    );
+
+    particle3Float.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 3000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+
+    particle4Float.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 4000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
   }, []);
 
   // Loading screen animations
@@ -330,6 +387,71 @@ export default function OnboardingScreen() {
     };
   });
 
+  // Visual design animated styles
+  const animatedCoreStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: pulseScale.value }],
+      opacity: interpolate(coreGlow.value, [0, 1], [0.7, 1]),
+    };
+  });
+
+  const animatedPulseStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: pulseScale.value * 0.8 }],
+      opacity: interpolate(coreGlow.value, [0, 1], [0.3, 0.6]),
+    };
+  });
+
+  const animatedParticle1Style = useAnimatedStyle(() => {
+    const translateX = interpolate(
+      particle1Rotation.value,
+      [0, 360],
+      [0, 2 * Math.PI]
+    );
+    return {
+      transform: [
+        { translateX: Math.cos(translateX) * 50 },
+        { translateY: Math.sin(translateX) * 50 },
+        { scale: interpolate(particle1Rotation.value % 180, [0, 90, 180], [0.6, 1, 0.6]) }
+      ],
+    };
+  });
+
+  const animatedParticle2Style = useAnimatedStyle(() => {
+    const translateX = interpolate(
+      particle2Rotation.value,
+      [-360, 0],
+      [0, 2 * Math.PI]
+    );
+    return {
+      transform: [
+        { translateX: Math.cos(translateX) * 35 },
+        { translateY: Math.sin(translateX) * 35 },
+        { scale: interpolate(Math.abs(particle2Rotation.value) % 180, [0, 90, 180], [0.4, 0.8, 0.4]) }
+      ],
+    };
+  });
+
+  const animatedParticle3Style = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateY: interpolate(particle3Float.value, [0, 1], [0, -10]) },
+        { scale: interpolate(particle3Float.value, [0, 1], [0.6, 1]) }
+      ],
+      opacity: interpolate(particle3Float.value, [0, 0.5, 1], [0.4, 0.8, 0.4]),
+    };
+  });
+
+  const animatedParticle4Style = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateY: interpolate(particle4Float.value, [0, 1], [0, 8]) },
+        { scale: interpolate(particle4Float.value, [0, 1], [0.8, 0.5]) }
+      ],
+      opacity: interpolate(particle4Float.value, [0, 0.5, 1], [0.6, 0.3, 0.6]),
+    };
+  });
+
   // Sparkle animated styles
   const createSparkleStyle = (sparkleOpacity: Animated.SharedValue<number>) => {
     return useAnimatedStyle(() => {
@@ -346,6 +468,27 @@ export default function OnboardingScreen() {
   const sparkle4Style = createSparkleStyle(sparkle4Opacity);
   const sparkle5Style = createSparkleStyle(sparkle5Opacity);
   const sparkle6Style = createSparkleStyle(sparkle6Opacity);
+
+  // Visual design component
+  const VisualDesign = () => (
+    <View style={styles.visualContainer}>
+      <View style={styles.energyRing}>
+        <View style={styles.middleRing}>
+          <View style={styles.innerRing}>
+            <Animated.View style={[styles.energyCore, animatedCoreStyle]}>
+              <Animated.View style={[styles.energyPulse, animatedPulseStyle]} />
+            </Animated.View>
+          </View>
+        </View>
+      </View>
+      
+      {/* Floating particles */}
+      <Animated.View style={[styles.particle, styles.particle1, animatedParticle1Style]} />
+      <Animated.View style={[styles.particle, styles.particle2, animatedParticle2Style]} />
+      <Animated.View style={[styles.particle, styles.particle3, animatedParticle3Style]} />
+      <Animated.View style={[styles.particle, styles.particle4, animatedParticle4Style]} />
+    </View>
+  );
 
   // Loading screen component
   if (showLoading) {
@@ -413,10 +556,7 @@ export default function OnboardingScreen() {
             <ChevronLeft size={24} color="#64748b" />
           </TouchableOpacity>
           
-          <View style={styles.progressContainer}>
-            <Text style={styles.progress}>
-              {currentQuestion + 1} of {questions.length}
-            </Text>
+          <View style={styles.progressBarContainer}>
             <View style={styles.progressBar}>
               <Animated.View 
                 style={[
@@ -429,6 +569,11 @@ export default function OnboardingScreen() {
               />
             </View>
           </View>
+        </View>
+
+        {/* Visual Design Section */}
+        <View style={styles.visualSection}>
+          <VisualDesign />
         </View>
 
         <Animated.View style={[styles.contentContainer, animatedContentStyle]}>
@@ -567,17 +712,9 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
-  progressContainer: {
+  progressBarContainer: {
     flex: 1,
-    alignItems: 'center',
     paddingHorizontal: 20,
-  },
-  progress: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#64748b',
-    marginBottom: 8,
-    textAlign: 'center',
   },
   progressBar: {
     width: '100%',
@@ -590,6 +727,83 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#3b82f6',
     borderRadius: 2,
+  },
+  visualSection: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+  },
+  visualContainer: {
+    width: 120,
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  energyRing: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#3b82f620',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  middleRing: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 2,
+    borderColor: '#3b82f640',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerRing: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    borderWidth: 2,
+    borderColor: '#3b82f660',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  energyCore: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#3b82f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  energyPulse: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#3b82f680',
+  },
+  particle: {
+    position: 'absolute',
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#3b82f6',
+  },
+  particle1: {
+    top: 15,
+    right: 25,
+  },
+  particle2: {
+    bottom: 20,
+    left: 20,
+  },
+  particle3: {
+    top: 40,
+    left: 10,
+  },
+  particle4: {
+    bottom: 40,
+    right: 15,
   },
   contentContainer: {
     flex: 1,
